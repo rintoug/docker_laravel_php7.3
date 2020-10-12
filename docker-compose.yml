@@ -1,0 +1,41 @@
+version: "3.1"
+services:
+  php7:
+    build:
+      context: docker/apache_php
+    container_name: grayloon_php
+    links:
+      - db
+      - phpmyadmin
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html
+      - ~/.composer/auth.json:/root/.composer/auth.json
+
+  db:
+    build:
+      context: docker/db
+    container_name: grayloon_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=grayloonroot@123
+      - MYSQL_DATABASE=grayloon
+      - MYSQL_USER=grayloon
+      - MYSQL_PASSWORD=grayloon@123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mydata:/var/lib/mysql
+  phpmyadmin:
+      depends_on:
+        - db
+      image: phpmyadmin/phpmyadmin
+      ports:
+        - "8080:80"
+      environment:
+        MYSQL_USERNAME: root
+        MYSQL_ROOT_PASSWORD: grayloonroot@123
+        PMA_HOST: db
+
+volumes:
+  mydata:
